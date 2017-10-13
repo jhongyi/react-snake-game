@@ -15,6 +15,7 @@ const direction = {
   bottom: 40,
 };
 
+let costTimeInterval;
 const gameSpeed = 50;
 
 const defaultState = {
@@ -23,6 +24,8 @@ const defaultState = {
   point: 232,
   canUpdateDirection: true,
   timeoutId: undefined,
+  costTime: 0,
+  score: 0,
 };
 
 export default class Content extends Component {
@@ -30,6 +33,7 @@ export default class Content extends Component {
     super();
     this.state = {
       stage: this.generateStage(),
+      ranking: [],
       ...defaultState,
     };
   }
@@ -46,16 +50,27 @@ export default class Content extends Component {
 
 
   gameStart = () => {
+    costTimeInterval = setInterval(() => {
+      this.setState({costTime: this.state.costTime + 1});
+    }, 1000);
     this.setState({ timeoutId: setTimeout(this.updateGame, gameSpeed) });
   }
 
   resetGame = () => {
+    const newRanking = {
+      costTime: this.state.costTime,
+      score: this.state.score
+    };
+    this.setState({
+      ranking: [...this.state.ranking, newRanking]
+    });
     this.setState(defaultState);
   }
 
   gameOver = () => {
     clearTimeout(this.state.timeoutId);
     this.setState({ timeoutId: undefined });
+    clearInterval(costTimeInterval);
   }
 
   shouldUpdatePoint = () => this.state.snake[0] === this.state.point;
@@ -128,9 +143,6 @@ export default class Content extends Component {
         break;
       default:
     }
-    console.log('------------------------------------');
-    console.log(newSnake);
-    console.log('------------------------------------');
     if (this.isGameEnd(newSnake, this.state.snake)) {
       this.gameOver();
       alert('遊戲結束');
@@ -138,6 +150,7 @@ export default class Content extends Component {
       return;
     }
     if (this.shouldUpdatePoint()) {
+      this.setState({ score: this.state.score + 10 });
       this.genreateNewPoint();
     } else {
       // 拿掉陣列最後一個數值
@@ -207,8 +220,30 @@ export default class Content extends Component {
               </div>
             )
           }
+          <div>分數: {this.state.score}&nbsp;分</div>
+          <div>時間: {this.state.costTime}&nbsp;秒</div>
         </div>
-        {/* <div>點一下黑色區域以後就可以用上下左右操控</div> */}
+        <div>
+          <h2 style={{ textAlign: 'center' }}>排行榜</h2>
+          <table>
+            <tr>
+              <th style={{ width: '100px' }}>時間</th>
+              <th style={{ width: '100px' }}>分數</th>
+            </tr>
+            {
+              this.state.ranking.map((record, index) =>
+                <tr key={index}>
+                  <td style={{ textAlign: 'center' }}>
+                    {record.costTime}&nbsp;秒
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    {record.score}&nbsp;分
+                  </td>
+                </tr>
+              )
+            }
+          </table>
+        </div>
       </div>
     );
   }
