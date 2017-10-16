@@ -107,7 +107,8 @@ export default class Content extends Component {
     console.log(oldSnakeHead);
     console.log('------------------------------------');
     // 判斷頭是否撞到身體
-    const headCount = newSnake.reduce((acc, val) => { if (val === newSnakeHead) { return acc + 1; } return acc; }, 0);
+    const headCount = newSnake.reduce((acc, val) => { if (val === newSnakeHead) { console.log('hey', val); return acc + 1; } return acc; }, 0);
+    // 大於 1 代表 head 的數值在陣列中存在 2 次代表頭撞到身體, 如: [771, 721, 720, 770, 771, 772]
     if (headCount > 1) {
       isEnd = true;
     }
