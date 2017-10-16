@@ -75,7 +75,7 @@ export default class Content extends Component {
 
   shouldUpdatePoint = () => this.state.snake[0] === this.state.point;
 
-  genreateNewPoint = () => {
+  generateNewPoint = () => {
     let newPoint;
     const hasDuplicatePoint = () => this.state.snake.find(snakeId => snakeId === newPoint);
     do {
@@ -106,12 +106,17 @@ export default class Content extends Component {
     console.log(newSnakeHead);
     console.log(oldSnakeHead);
     console.log('------------------------------------');
+    // 判斷頭是否撞到身體
+    const headCount = newSnake.reduce((acc, val) => { if (val === newSnakeHead) { return acc + 1; } return acc; }, 0);
+    if (headCount > 1) {
+      isEnd = true;
+    }
     // 上面牆壁
     if (newSnakeHead < 0) {
       isEnd = true;
     }
     // 下面牆壁
-    if (newSnakeHead > ((gameStageArea.height * gameStageArea.width) - 1)) {
+    if (newSnakeHead < 0 || newSnakeHead > ((gameStageArea.height * gameStageArea.width) - 1)) {
       isEnd = true;
     }
     // 左邊牆壁
@@ -151,7 +156,7 @@ export default class Content extends Component {
     }
     if (this.shouldUpdatePoint()) {
       this.setState({ score: this.state.score + 10 });
-      this.genreateNewPoint();
+      this.generateNewPoint();
     } else {
       // 拿掉陣列最後一個數值
       newSnake.pop();
@@ -209,7 +214,7 @@ export default class Content extends Component {
                     <div
                       className={classNames('stageCol',
                         {
-                          snake: this.state.snake.find(snakeId => stageCol.id === snakeId),
+                          snake: Number.isInteger(this.state.snake.find(snakeId => stageCol.id === snakeId)),
                           point: this.state.point === stageCol.id
                         }
                       )}
